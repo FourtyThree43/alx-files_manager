@@ -1,22 +1,24 @@
-// const { Router } = require('express');
-const dbClient = require('../utils/db');
-const redisClient = require('../utils/redis');
+import { isAlive, nbUsers, nbFiles } from '../utils/db';
+import { isAlive as redisIsAlive } from '../utils/redis';
 
 /**
- *
+ * Controller for the index route.
+ * @class AppController
+ * @method getStatus
+ * @method getStats
  */
 class AppController {
-  static async getStatus(req, res) {
-    const redisAlive = await redisClient.isAlive();
-    const dbAlive = await dbClient.isAlive();
+  static async getStatus(_req, res) {
+    const redisAlive = redisIsAlive();
+    const dbAlive = isAlive();
 
     res.status(200).json({ redis: redisAlive, db: dbAlive });
   }
 
-  static async getStats(req, res) {
+  static async getStats(_req, res) {
     try {
-      const userCount = await dbClient.nbUsers();
-      const fileCount = await dbClient.nbFiles();
+      const userCount = await nbUsers();
+      const fileCount = await nbFiles();
 
       res.status(200).json({ users: userCount, files: fileCount });
     } catch (error) {
@@ -26,4 +28,4 @@ class AppController {
   }
 }
 
-module.exports = AppController;
+export default AppController;

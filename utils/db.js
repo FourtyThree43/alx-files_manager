@@ -1,4 +1,4 @@
-const { MongoClient } = require('mongodb');
+import { MongoClient } from 'mongodb';
 
 /**
  * MongoDB client class.
@@ -11,12 +11,11 @@ const { MongoClient } = require('mongodb');
 
 class DBClient {
   constructor() {
-    const host = process.env.DB_HOST || 'localhost';
-    const port = process.env.DB_PORT || 27017;
-    const database = process.env.DB_DATABASE || 'files_manager';
-
-    this.uri = `mongodb://${host}:${port}/${database}`;
-    this.client = new MongoClient(this.uri, { useNewUrlParser: true });
+    this.host = process.env.DB_HOST || 'localhost';
+    this.port = process.env.DB_PORT || 27017;
+    this.database = process.env.DB_DATABASE || 'files_manager';
+    this.uri = `mongodb://${this.host}:${this.port}`;
+    this.client = new MongoClient(this.uri, { useUnifiedTopology: true });
   }
 
   /**
@@ -42,12 +41,12 @@ class DBClient {
   async nbUsers() {
     try {
       await this.client.connect();
-      const usersCount = await this.client.db().collection('users').countDocuments();
+      const usersCount = await this.client.db(this.database).collection('users').countDocuments();
       await this.client.close();
       return usersCount;
     } catch (err) {
-      console.error(`MongoDB Connection Error: ${err}`);
-      return false;
+      console.error(err);
+      return null;
     } finally {
       await this.client.close();
     }
@@ -60,12 +59,12 @@ class DBClient {
   async nbFiles() {
     try {
       await this.client.connect();
-      const filesCount = await this.client.db().collection('files').countDocuments();
+      const filesCount = await this.client.db(this.database).collection('files').countDocuments();
       await this.client.close();
       return filesCount;
     } catch (err) {
-      console.error(`MongoDB Connection Error: ${err}`);
-      return false;
+      console.error(err);
+      return null;
     } finally {
       await this.client.close();
     }
@@ -73,4 +72,4 @@ class DBClient {
 }
 
 const dbClient = new DBClient();
-module.exports = dbClient;
+export default dbClient;
