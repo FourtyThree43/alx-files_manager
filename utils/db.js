@@ -28,7 +28,7 @@ class DBClient {
       await this.client.connect();
       return true;
     } catch (err) {
-      console.error(`MongoDB Connection Error: ${err}`);
+      // console.error(`MongoDB Connection Error: ${err}`);
       return false;
     } finally {
       await this.client.close();
@@ -46,7 +46,7 @@ class DBClient {
       await this.client.close();
       return usersCount;
     } catch (err) {
-      console.error(`MongoDB Connection Error: ${err}`);
+      // console.error(`MongoDB Connection Error: ${err}`);
       return false;
     } finally {
       await this.client.close();
@@ -64,7 +64,7 @@ class DBClient {
       await this.client.close();
       return filesCount;
     } catch (err) {
-      console.error(`MongoDB Connection Error: ${err}`);
+      // console.error(`MongoDB Connection Error: ${err}`);
       return false;
     } finally {
       await this.client.close();
