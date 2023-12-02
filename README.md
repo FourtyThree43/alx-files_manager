@@ -46,4 +46,10 @@ Read or watch:
 * Languages: *JavaScript*
 * OS: *Ubuntu 18.04 LTS*
 * *Node* version *12.x.x*
-
+* *MongoDB* version *4.2.x*
+* *Redis* version *6.x.x*
+* Style guidelines: [ESLint rules](https://eslint.org/docs/latest/rules/)
+* Package: [package.json](./package.json)
+* Dependencies: [package-lock.json](./package-lock.json)
+* Testing: [Mocha](https://mochajs.org/) and [Chai](https://www.chaijs.com/)
+* Docker: [docker-compose.yml](./docker-compose.yml)
