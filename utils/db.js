@@ -40,17 +40,10 @@ class DBClient {
    * @returns {Promise<number>} The number of documents in the collection users.
    */
   async nbUsers() {
-    try {
-      await this.client.connect();
-      const usersCount = await this.client.db().collection('users').countDocuments();
-      await this.client.close();
-      return usersCount;
-    } catch (err) {
-      // console.error(`MongoDB Connection Error: ${err}`);
-      return false;
-    } finally {
-      await this.client.close();
-    }
+    await this.client.connect();
+    const usersCount = await this.client.db().collection('users').countDocuments();
+    await this.client.close();
+    return usersCount;
   }
 
   /**
@@ -58,17 +51,10 @@ class DBClient {
    * @returns {Promise<number>} The number of documents in the collection files.
    */
   async nbFiles() {
-    try {
-      await this.client.connect();
-      const filesCount = await this.client.db().collection('files').countDocuments();
-      await this.client.close();
-      return filesCount;
-    } catch (err) {
-      // console.error(`MongoDB Connection Error: ${err}`);
-      return false;
-    } finally {
-      await this.client.close();
-    }
+    await this.client.connect();
+    const filesCount = await this.client.db().collection('files').countDocuments();
+    await this.client.close();
+    return filesCount;
   }
 }
 
