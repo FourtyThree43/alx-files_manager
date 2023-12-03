@@ -1,19 +1,18 @@
-import { Router } from 'express';
-import AppController from '../controllers/AppController';
+// eslint-disable-next-line no-unused-vars
+import { Express } from 'express';
+import apiController from '../controllers/AppController';
+import UsersController from '../controllers/UsersController';
 
-const router = Router();
+/**
+ * Initialize the routes of the api.
+ * @param {Express} api - The express apilication object.
+ * @returns {void} Void
+ */
+const initializeRoutes = (api) => {
+  api.get('/status', apiController.getStatus);
+  api.get('/stats', apiController.getStats);
 
-const handleRoute = (route, handler) => {
-  router.route(route).get((req, res, next) => {
-    try {
-      handler(req, res, next);
-    } catch (error) {
-      next(error);
-    }
-  });
+  api.post('/users', UsersController.postNew);
 };
 
-handleRoute('/status', AppController.getStatus);
-handleRoute('/stats', AppController.getStats);
-
-export default router;
+export default initializeRoutes;
