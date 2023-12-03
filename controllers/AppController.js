@@ -1,5 +1,5 @@
-import { isAlive, nbUsers, nbFiles } from '../utils/db';
-import { isAlive as redisIsAlive } from '../utils/redis';
+import redisClient from '../utils/redis';
+import dbClient from '../utils/db';
 
 /**
  * Controller for the index route.
@@ -8,23 +8,15 @@ import { isAlive as redisIsAlive } from '../utils/redis';
  * @method getStats
  */
 class AppController {
-  static async getStatus(_req, res) {
-    const redisAlive = redisIsAlive();
-    const dbAlive = isAlive();
-
-    res.status(200).json({ redis: redisAlive, db: dbAlive });
+  static getStatus(_req, res) {
+    res.status(200).json({ redis: redisClient.isAlive(), db: dbClient.isAlive() });
   }
 
-  static async getStats(_req, res) {
-    try {
-      const userCount = await nbUsers();
-      const fileCount = await nbFiles();
-
-      res.status(200).json({ users: userCount, files: fileCount });
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
+  static getStats(_req, res) {
+    Promise.all([dbClient.nbUsers(), dbClient.nbFiles()])
+      .then(([usersCount, filesCount]) => {
+        res.status(200).json({ users: usersCount, files: filesCount });
+      });
   }
 }
 

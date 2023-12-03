@@ -20,7 +20,16 @@ class DBClient {
     const uri = `mongodb://${host}:${port}/${database}`;
 
     this.client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    this.client.connect();
+
+    this.client.connect((err) => {
+      if (!err) {
+        // console.log(`Connected to MongoDB at ${host}:${port}/${database}`);
+        this.dbAlive = true;
+      } else {
+        console.error(err.message);
+        this.dbAlive = false;
+      }
+    });
   }
 
   /**
@@ -28,7 +37,7 @@ class DBClient {
    * @returns {boolean} true if connected, false otherwise.
    */
   isAlive() {
-    return this.client.isConnected();
+    return !!this.dbAlive;
   }
 
   /**

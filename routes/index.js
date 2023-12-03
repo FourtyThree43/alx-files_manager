@@ -3,7 +3,17 @@ import AppController from '../controllers/AppController';
 
 const router = Router();
 
-router.get('/status', AppController.getStatus);
-router.get('/stats', AppController.getStats);
+const handleRoute = (route, handler) => {
+  router.route(route).get((req, res, next) => {
+    try {
+      handler(req, res, next);
+    } catch (error) {
+      next(error);
+    }
+  });
+};
+
+handleRoute('/status', AppController.getStatus);
+handleRoute('/stats', AppController.getStats);
 
 export default router;
