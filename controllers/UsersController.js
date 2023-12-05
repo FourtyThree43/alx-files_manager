@@ -1,10 +1,12 @@
 import sha1 from 'sha1';
 import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
 
 /**
  * Controller for the index route.
  * @class UsersController
  * @method postNew
+ * @method getMe
  */
 class UsersController {
   /**
@@ -22,8 +24,6 @@ class UsersController {
     if (!email) return res.status(400).json({ error: 'Missing email' });
     if (!password) return res.status(400).json({ error: 'Missing password' });
 
-    console.log(email, password);
-
     const user = await (await dbClient.usersCollection()).findOne({ email });
 
     if (user) return res.status(400).json({ error: 'Already exist' });
@@ -36,6 +36,24 @@ class UsersController {
     } catch (err) {
       return res.status(500).json({ error: err.message });
     }
+  }
+
+  /**
+   * Method for the route GET /users/me.
+   * Fetches a user in DB.
+   * @param {object} req - The express request object.
+   * @param {object} res - The express response object.
+   * @returns {object} The status code 200 and the user if successful,
+   */
+  static async getMe(req, res) {
+    const token = req.headers['x-token'];
+    if (!token) return null;
+
+    const userId = await redisClient.get(`auth_${token}`);
+    const user = await (await dbClient.findUserById(userId));
+    if (!user) return res.status(401).json({ error: 'Unauthorized' });
+
+    return res.status(200).json({ email: user.email, id: userId.toString() });
   }
 }
 

@@ -1,3 +1,5 @@
+import mongoDBCore from 'mongodb/lib/core';
+
 const { MongoClient } = require('mongodb');
 
 /**
@@ -62,6 +64,26 @@ class DBClient {
    */
   async usersCollection() {
     return this.client.db().collection('users');
+  }
+
+  /**
+   * Retrieves a user by their email.
+   * @param {string} email - The user's email.
+   * @returns {Promise<Document>} The user document.
+   */
+  async findUserByEmail(email) {
+    const usersCollection = await this.usersCollection();
+    return usersCollection.findOne({ email });
+  }
+
+  /**
+   * Retrieves a user by their ID.
+   * @param {string} userId - The user's ID.
+   * @returns {Promise<Document>} The user document.
+   */
+  async findUserById(userId) {
+    const usersCollection = await this.usersCollection();
+    return usersCollection.findOne({ _id: new mongoDBCore.BSON.ObjectId(userId) });
   }
 }
 

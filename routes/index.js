@@ -1,7 +1,8 @@
 // eslint-disable-next-line no-unused-vars
 import { Express } from 'express';
-import apiController from '../controllers/AppController';
+import AppController from '../controllers/AppController';
 import UsersController from '../controllers/UsersController';
+import AuthController from '../controllers/AuthController';
 
 /**
  * Initialize the routes of the api.
@@ -9,10 +10,14 @@ import UsersController from '../controllers/UsersController';
  * @returns {void} Void
  */
 const initializeRoutes = (api) => {
-  api.get('/status', apiController.getStatus);
-  api.get('/stats', apiController.getStats);
+  api.get('/status', AppController.getStatus);
+  api.get('/stats', AppController.getStats);
 
   api.post('/users', UsersController.postNew);
+  api.get('/users/me', UsersController.getMe);
+
+  api.get('/connect', AuthController.getConnect);
+  api.get('/disconnect', AuthController.getDisconnect);
 };
 
 export default initializeRoutes;

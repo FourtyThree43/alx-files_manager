@@ -5,7 +5,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // express.json() middleware
-app.use(express.json());
+app.use(express.json({ limit: '200mb' }));
 
 // Initialize routes
 initializeRoutes(app);
