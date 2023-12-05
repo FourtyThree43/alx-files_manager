@@ -16,7 +16,9 @@ class AuthController {
   }
 
   static async getDisconnect(req, res) {
-    await redisClient.del(req.user.token);
+    const token = req.headers['x-token'];
+
+    await redisClient.del(`auth_${token}`);
     return res.status(204).send();
   }
 }

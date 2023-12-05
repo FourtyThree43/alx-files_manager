@@ -11,7 +11,7 @@ import redisClient from '../utils/redis';
  */
 const authenticate = async (req, res, next) => {
   const token = req.headers['x-token'];
-  const BasicAuth = req.headers.authorization || null;
+  const authorization = req.headers.authorization || null;
 
   if (token) {
     const userId = await redisClient.get(`auth_${token}`);
@@ -21,8 +21,8 @@ const authenticate = async (req, res, next) => {
     }
     req.user = user;
     next();
-  } else if (BasicAuth) {
-    const base64Credentials = BasicAuth.split(' ')[1];
+  } else if (authorization) {
+    const base64Credentials = authorization.split(' ')[1];
     const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
     const [email, password] = credentials.split(':');
 

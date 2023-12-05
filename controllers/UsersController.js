@@ -46,14 +46,7 @@ class UsersController {
    * @returns {object} The status code 200 and the user if successful,
    */
   static async getMe(req, res) {
-    const token = req.headers['x-token'];
-    if (!token) return null;
-
-    const userId = await redisClient.get(`auth_${token}`);
-    const user = await (await dbClient.findUserById(userId));
-    if (!user) return res.status(401).json({ error: 'Unauthorized' });
-
-    return res.status(200).json({ email: user.email, id: userId.toString() });
+    return res.status(200).json({ email: req.user.email, id: req.user._id.toString() });
   }
 }
 
