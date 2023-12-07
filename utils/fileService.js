@@ -16,7 +16,7 @@ const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
  * @param {Object} dbClient - The database client.
  * @returns {Promise<Object>} The created file document.
  */
-const createFileInDB = async (fileData, dbClient) => {
+const saveFileInDB = async (fileData, dbClient) => {
   const filesCollection = await dbClient.filesCollection();
   const result = await filesCollection.insertOne(fileData);
   return result.ops[0];
@@ -28,7 +28,7 @@ const createFileInDB = async (fileData, dbClient) => {
  * @param {string} filename - The name of the file.
  * @returns {Promise<string>} The path of the created file.
  */
-const createFileInDisk = async (base64Data, filename) => {
+const saveFileInDisk = async (base64Data, filename) => {
   if (!existsSync(FOLDER_PATH)) {
     await mkDirAsync(FOLDER_PATH);
   }
@@ -37,4 +37,12 @@ const createFileInDisk = async (base64Data, filename) => {
   return filePath;
 };
 
-export { createFileInDB, createFileInDisk };
+// const createThumbnail = async (newFile) => {
+// }
+
+const fileService = {
+  saveFileInDB,
+  saveFileInDisk,
+};
+
+export default fileService;

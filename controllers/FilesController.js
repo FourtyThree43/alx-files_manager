@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { createFileInDB, createFileInDisk } from '../middlewares/fileService';
+import fileService from '../utils/fileService';
 import dbClient from '../utils/db';
 
 const VALID_FILE_TYPES = { folder: 'folder', file: 'file', image: 'image' };
@@ -43,14 +43,31 @@ class FilesController {
     };
 
     if (type === VALID_FILE_TYPES.folder) {
-      const newFolder = await createFileInDB(fileData, dbClient);
-      return res.status(201).json(newFolder);
+      const newFolder = await fileService.saveFileInDB(fileData, dbClient);
+      return res.send({
+        id: newFolder._id.toString(),
+        userId: newFolder.userId,
+        name: newFolder.name,
+        type: newFolder.type,
+        isPublic: newFolder.isPublic,
+        parentId: newFolder.parentId,
+      });
     }
     const filename = uuidv4();
-    const localPath = await createFileInDisk(data, filename);
+    const localPath = await fileService.saveFileInDisk(data, filename);
     fileData.localPath = localPath;
-    const newFile = await createFileInDB(fileData, dbClient);
-    return res.status(201).json(newFile);
+    const newFile = await fileService.saveFileInDB(fileData, dbClient);
+    const fileId = newFile._id.toString();
+
+    return res.send({
+      id: fileId,
+      userId: newFile.userId,
+      name: newFile.name,
+      type: newFile.type,
+      isPublic: newFile.isPublic,
+      parentId: newFile.parentId,
+      localPath: newFile.localPath,
+    });
   }
 }
 

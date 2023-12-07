@@ -101,7 +101,7 @@ class DBClient {
    */
   async getFileById(fileId) {
     const filesCollection = await this.filesCollection();
-    return filesCollection.findOne({ _id: new mongoDBCore.BSON.ObjectId(fileId) });
+    return filesCollection.findOne({ id: new mongoDBCore.BSON.ObjectId(fileId) });
   }
 }
 

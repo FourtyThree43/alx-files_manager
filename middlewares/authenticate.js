@@ -22,8 +22,12 @@ const verifyToken = async (req, res, next) => {
     req.user = user;
     next();
   } else if (authorization) {
-    const base64Credentials = authorization.split(' ')[1];
-    const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+    const base64Credentials = authorization.split(' ');
+    if (base64Credentials.length !== 2 || base64Credentials[0] !== 'Basic') {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const credentials = Buffer.from(base64Credentials[1], 'base64').toString('ascii');
     const [email, password] = credentials.split(':');
 
     const sha1Password = sha1(password);
