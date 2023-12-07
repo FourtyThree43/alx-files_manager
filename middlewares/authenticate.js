@@ -3,13 +3,13 @@ import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 
 /**
- * Middleware to authenticate a user.
+ * Middleware for verifing token to authenticate a user.
  * @param {Request} req - The express request object.
  * @param {NextFunction} next - The express next function.
  * @param {Response} res - The express response object.
  * @returns {void} Void
  */
-const authenticate = async (req, res, next) => {
+const verifyToken = async (req, res, next) => {
   const token = req.headers['x-token'];
   const authorization = req.headers.authorization || null;
 
@@ -41,4 +41,4 @@ const authenticate = async (req, res, next) => {
   return null;
 };
 
-export default authenticate;
+export default verifyToken;

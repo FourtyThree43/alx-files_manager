@@ -85,6 +85,24 @@ class DBClient {
     const usersCollection = await this.usersCollection();
     return usersCollection.findOne({ _id: new mongoDBCore.BSON.ObjectId(userId) });
   }
+
+  /**
+   * Retrieves a reference to the `files` collection.
+   * @returns {Promise<Collection>}
+   */
+  async filesCollection() {
+    return this.client.db().collection('files');
+  }
+
+  /**
+   * Retrives a file by their ID.
+   * @param {string} fileId - The file's ID.
+   * @return {Promise<Document>} The file document.
+   */
+  async getFileById(fileId) {
+    const filesCollection = await this.filesCollection();
+    return filesCollection.findOne({ _id: new mongoDBCore.BSON.ObjectId(fileId) });
+  }
 }
 
 const dbClient = new DBClient();
