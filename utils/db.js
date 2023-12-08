@@ -104,6 +104,19 @@ class DBClient {
     return filesCollection.findOne({ id: new mongoDBCore.BSON.ObjectId(fileId) });
   }
 
+  /**
+   * Retrives a file by their ID and User ID.
+   * @param {string} fileId - The file's ID.
+   * @return {Promise<Document>} The file document.
+   */
+  async getFileByIdAndUserId(fileId, userId) {
+    const filesCollection = await this.filesCollection();
+    return filesCollection.findOne({
+    _id: new mongoDBCore.BSON.ObjectId(fileId),
+    userId: new mongoDBCore.BSON.ObjectId(userId)
+    });
+  }
+
   async getFilesByQueryFilters(pipeline) {
     const filesCollection = await this.filesCollection();
     return filesCollection.aggregate(pipeline).toArray();

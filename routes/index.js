@@ -24,6 +24,8 @@ const initializeRoutes = (api) => {
   api.post('/files', verifyToken, FilesController.postUpload);
   api.get('/files/:id', verifyToken, FilesController.getShow);
   api.get('/files', verifyToken, FilesController.getIndex);
+  api.put('/files/:id/publish', verifyToken, FilesController.putPublish);
+  api.put('/files/:id/publish', verifyToken, FilesController.putUnpublish);
 };
 
 export default initializeRoutes;

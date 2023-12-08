@@ -4,6 +4,7 @@ import dbClient from '../utils/db';
 
 const VALID_FILE_TYPES = { folder: 'folder', file: 'file', image: 'image' };
 const MAX_FILES_PER_PAGE = 20;
+const { ObjectId } = require('mongodb');
 
 /**
  * Controller for the index route.
@@ -132,6 +133,59 @@ class FilesController {
     const files = await dbClient.getFilesByQueryFilters(aggregatePipeline);
 
     return res.json(files);
+  }
+
+  static async putPublish(req, res) {
+    const { user } = req;
+    const id = req.params.id || '';
+    const userId = user._id.toString();
+
+    const file = await dbClient.getFileByIdAndUserId(id, userId);
+    if (!file) return res.status(404).json({ error: 'Not found' });
+
+    const fileFilter = {
+      _id: ObjectId(id),
+      userId: ObjectId(userId),
+    };
+    await (await dbClient.filesCollection()).updateOne(fileFilter, { $set: { isPublic: true } });
+
+    return res.status(200).json({
+      id,
+      userId,
+      name: file.name,
+      type: file.type,
+      isPublic: true,
+      parentId: file.parentId === '0'
+        ? 0
+        : file.parentId.toString(),
+    });
+  }
+
+  static async putUnpublish(req, res) {
+    const { user } = req;
+    const id = req.params.id || '';
+    const userId = user._id.toString();
+
+    const file = await dbClient.getFileByIdAndUserId(id, userId);
+    if (!file) return res.status(404).json({ error: 'Not found' });
+
+    const fileFilter = {
+      _id: ObjectId(id),
+      userId: ObjectId(userId),
+    };
+    await (await dbClient.filesCollection())
+      .updateOne(fileFilter, { $set: { isPublic: false } });
+
+    return res.status(200).json({
+      id,
+      userId,
+      name: file.name,
+      type: file.type,
+      isPublic: false,
+      parentId: file.parentId === '0'
+        ? 0
+        : file.parentId.toString(),
+    });
   }
 }
 
