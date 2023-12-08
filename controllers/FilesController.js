@@ -5,6 +5,8 @@ import dbClient from '../utils/db';
 const VALID_FILE_TYPES = { folder: 'folder', file: 'file', image: 'image' };
 const MAX_FILES_PER_PAGE = 20;
 const { ObjectId } = require('mongodb');
+const fs = require('fs');
+const mime = require('mime-types');
 
 /**
  * Controller for the index route.
@@ -164,7 +166,7 @@ class FilesController {
   static async putUnpublish(req, res) {
     const { user } = req;
     const id = req.params.id || '';
-    const userId = user._id.toString();
+    const userId = user ? user._id.toString() : '';
 
     const file = await dbClient.getFileByIdAndUserId(id, userId);
     if (!file) return res.status(404).json({ error: 'Not found' });
@@ -186,6 +188,32 @@ class FilesController {
         ? 0
         : file.parentId.toString(),
     });
+  }
+
+  static async getFile(req, res) {
+    const { user } = req;
+    const id = req.params.id || '';
+    const size = req.query.size || null;
+    const userId = user ? user._id.toString() : '';
+
+    const file = await dbClient.getFileById(id);
+    if (!file || (!file.isPublic && (file.userId.toString() !== userId))) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+    if (file.type === VALID_FILE_TYPES.folder) {
+      return res.status(400).json({ error: 'A folder doesn\'t have content' });
+    }
+    const filePath = size === 0 ? file.localPath : `${file.localPath}_${size}`;
+
+    try {
+      const dataFile = fs.readFileSync(filePath);
+      const mimeType = mime.contentType(file.name);
+      res.setHeader('Content-Type', mimeType);
+
+      return res.send(dataFile);
+    } catch (error) {
+      return res.status(404).send({ error: 'Not found' });
+    }
   }
 }
 
