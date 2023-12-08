@@ -103,6 +103,11 @@ class DBClient {
     const filesCollection = await this.filesCollection();
     return filesCollection.findOne({ id: new mongoDBCore.BSON.ObjectId(fileId) });
   }
+
+  async getFilesByQueryFilters(pipeline) {
+    const filesCollection = await this.filesCollection();
+    return filesCollection.aggregate(pipeline).toArray();
+  }
 }
 
 const dbClient = new DBClient();

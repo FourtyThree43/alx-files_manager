@@ -1,10 +1,10 @@
 // eslint-disable-next-line no-unused-vars
 import { Express, Next } from 'express';
 import AppController from '../controllers/AppController';
-import UsersController from '../controllers/UsersController';
 import AuthController from '../controllers/AuthController';
-import verifyToken from '../middlewares/authenticate';
 import FilesController from '../controllers/FilesController';
+import UsersController from '../controllers/UsersController';
+import verifyToken from '../middlewares/authenticate';
 
 /**
  * Initialize the routes of the api.
@@ -22,6 +22,8 @@ const initializeRoutes = (api) => {
   api.get('/disconnect', verifyToken, AuthController.getDisconnect);
 
   api.post('/files', verifyToken, FilesController.postUpload);
+  api.get('/files/:id', verifyToken, FilesController.getShow);
+  api.get('/files', verifyToken, FilesController.getIndex);
 };
 
 export default initializeRoutes;

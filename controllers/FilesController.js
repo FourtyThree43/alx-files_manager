@@ -3,6 +3,7 @@ import fileService from '../utils/fileService';
 import dbClient from '../utils/db';
 
 const VALID_FILE_TYPES = { folder: 'folder', file: 'file', image: 'image' };
+const MAX_FILES_PER_PAGE = 20;
 
 /**
  * Controller for the index route.
@@ -68,6 +69,69 @@ class FilesController {
       parentId: newFile.parentId,
       localPath: newFile.localPath,
     });
+  }
+
+  /**
+   * Method for the route GET /files/:id
+   * Get's a file by it's ID.
+   * @param {object} req - The express request object.
+   * @param {object} res - The express response object.
+   * @return {object}
+   */
+  static async getShow(req, res) {
+    const { fileId } = req.params ? req.params.id : ' ';
+    const file = await dbClient.getFileById(fileId);
+    if (!file) return res.status(404).json({ error: 'Not found' });
+    if (file.userId.toString() !== req.user._id.toString()) return res.status(404).json({ error: 'Not found' });
+    return res.status(200).json({
+      id: file._id.toString(),
+      userId: file.userId,
+      name: file.name,
+      type: file.type,
+      isPublic: file.isPublic,
+      parentId: file.parentId,
+      // localPath: file.localPath,
+    });
+  }
+
+  /**
+   * Method for the route GET /files/
+   * Get's all files for a user.
+   * @param {object} _req - The express request object.
+   * @param {object} res - The express response object.
+   * @return {object} A list of file documents.
+   */
+  static async getIndex(req, res) {
+    const parentId = req.query.parentId || '0';
+    const page = req.query.page || 0;
+
+    const filesFilter = {
+      userId: req._id,
+      parentId,
+    };
+
+    const aggregatePipeline = [
+      { $match: filesFilter },
+      { $sort: { _id: -1 } },
+      { $skip: page * MAX_FILES_PER_PAGE },
+      { $limit: MAX_FILES_PER_PAGE },
+      {
+        $project: {
+          _id: 0,
+          id: '$_id',
+          userId: '$userId',
+          name: '$name',
+          type: '$type',
+          isPublic: '$isPublic',
+          parentId: {
+            $cond: { if: { $eq: ['$parentId', '0'] }, then: 0, else: '$parentId' },
+          },
+        },
+      },
+    ];
+    const files = await dbClient.getFilesByQueryFilters(aggregatePipeline);
+
+    return res.json(files);
   }
 }
 
