@@ -37,7 +37,7 @@ class FilesController {
 
     if (parentId) {
       const parentFile = await dbClient.getFileById(parentId);
-      if (!parentFile) return res.status(400).json({ error: 'Parent not found xxx' });
+      if (!parentFile) return res.status(400).json({ error: 'Parent not found' });
       if (parentFile.type !== VALID_FILE_TYPES.folder) return res.status(400).json({ error: 'Parent is not a folder' });
     }
 
@@ -92,7 +92,7 @@ class FilesController {
    * @return {object}
    */
   static async getShow(req, res) {
-    const { fileId } = req.params ? req.params.id : ' ';
+    const fileId = req.params ? req.params.id : '';
     const file = await dbClient.getFileById(fileId);
     if (!file) return res.status(404).json({ error: 'Not found' });
     if (file.userId.toString() !== req.user._id.toString()) return res.status(404).json({ error: 'Not found' });
@@ -148,9 +148,8 @@ class FilesController {
   }
 
   static async putPublish(req, res) {
-    const { user } = req;
     const id = req.params.id || '';
-    const userId = user._id.toString();
+    const userId = req.user._id;
 
     const file = await dbClient.getFileByIdAndUserId(id, userId);
     if (!file) return res.status(404).json({ error: 'Not found' });
@@ -174,9 +173,8 @@ class FilesController {
   }
 
   static async putUnpublish(req, res) {
-    const { user } = req;
     const id = req.params.id || '';
-    const userId = user ? user._id.toString() : '';
+    const userId = req.user ? req.user._id : '';
 
     const file = await dbClient.getFileByIdAndUserId(id, userId);
     if (!file) return res.status(404).json({ error: 'Not found' });
@@ -201,10 +199,9 @@ class FilesController {
   }
 
   static async getFile(req, res) {
-    const { user } = req;
     const id = req.params.id || '';
     const size = req.query.size || null;
-    const userId = user ? user._id.toString() : '';
+    const userId = req.user ? req.user._id : '';
 
     const file = await dbClient.getFileById(id);
     if (!file || (!file.isPublic && (file.userId.toString() !== userId))) {

@@ -26,7 +26,7 @@ const initializeRoutes = (api) => {
   api.get('/files/:id', verifyToken, FilesController.getShow);
   api.get('/files', verifyToken, FilesController.getIndex);
   api.put('/files/:id/publish', verifyToken, FilesController.putPublish);
-  api.put('/files/:id/publish', verifyToken, FilesController.putUnpublish);
+  api.put('/files/:id/unpublish', verifyToken, FilesController.putUnpublish);
   api.get('/files/:id/data', verifyToken, FilesController.getFile);
 
   api.all('*', (req, res, next) => {
