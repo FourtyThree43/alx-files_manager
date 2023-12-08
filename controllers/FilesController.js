@@ -3,12 +3,12 @@ import Queue from 'bull/lib/queue';
 import fileService from '../utils/fileService';
 import dbClient from '../utils/db';
 
-
 const VALID_FILE_TYPES = { folder: 'folder', file: 'file', image: 'image' };
 const MAX_FILES_PER_PAGE = 20;
 const { ObjectId } = require('mongodb');
 const fs = require('fs');
 const mime = require('mime-types');
+
 const fileQueue = new Queue('thumbnail generation');
 
 /**
@@ -67,6 +67,7 @@ class FilesController {
     const fileId = newFile._id.toString();
 
     // start thumbnail generation worker
+    const userId = req.user._id;
     if (type === VALID_FILE_TYPES.image) {
       const jobName = `Image thumbnail [${userId}-${fileId}]`;
       fileQueue.add({ userId, fileId, name: jobName });
@@ -170,7 +171,6 @@ class FilesController {
         ? 0
         : file.parentId.toString(),
     });
-
   }
 
   static async putUnpublish(req, res) {

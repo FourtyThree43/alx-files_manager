@@ -1,5 +1,8 @@
 import sha1 from 'sha1';
+import Queue from 'bull/lib/queue';
 import dbClient from '../utils/db';
+
+const userQueue = new Queue('email sending');
 
 /**
  * Controller for the index route.
@@ -31,6 +34,8 @@ class UsersController {
       const addUserInfo = await (await dbClient.usersCollection())
         .insertOne({ email, password: sha1(password) });
       const userId = addUserInfo.insertedId.toString();
+
+      userQueue.add({ userId });
       return res.status(201).json({ id: userId, email });
     } catch (err) {
       return res.status(500).json({ error: err.message });
