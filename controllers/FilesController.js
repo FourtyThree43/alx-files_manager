@@ -80,7 +80,7 @@ class FilesController {
       type: newFile.type,
       isPublic: newFile.isPublic,
       parentId: newFile.parentId,
-      localPath: newFile.localPath,
+      // localPath: newFile.localPath,
     });
   }
 

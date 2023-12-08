@@ -7,8 +7,6 @@ import {
 // Convert callback-based fs functions to promise-based
 const mkDirAsync = promisify(mkdir);
 const writeFileAsync = promisify(writeFile);
-const statAsync = promisify(stat);
-const realpathAsync = promisify(realpath);
 
 const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
 
