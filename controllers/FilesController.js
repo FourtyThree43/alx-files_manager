@@ -46,12 +46,12 @@ class FilesController {
       name,
       type,
       isPublic: isPublic || false,
-      parentId: parentId || '0',
+      parentId: parentId || 0,
     };
 
     if (type === VALID_FILE_TYPES.folder) {
       const newFolder = await fileService.saveFileInDB(fileData, dbClient);
-      return res.send({
+      return res.status(201).json({
         id: newFolder._id.toString(),
         userId: newFolder.userId,
         name: newFolder.name,
@@ -73,7 +73,7 @@ class FilesController {
       fileQueue.add({ userId, fileId, name: jobName });
     }
 
-    return res.send({
+    return res.status(201).json({
       id: fileId,
       userId: newFile.userId,
       name: newFile.name,
@@ -110,12 +110,12 @@ class FilesController {
   /**
    * Method for the route GET /files/
    * Get's all files for a user.
-   * @param {object} _req - The express request object.
+   * @param {object} req - The express request object.
    * @param {object} res - The express response object.
    * @return {object} A list of file documents.
    */
   static async getIndex(req, res) {
-    const parentId = req.query.parentId || '0';
+    const parentId = req.query.parentId || 0;
     const page = req.query.page || 0;
 
     const filesFilter = {
@@ -147,6 +147,13 @@ class FilesController {
     return res.json(files);
   }
 
+  /**
+   * Method for the route PUT /files/:id/publish
+   * Publish a file by it's ID.
+   * @param {object} req - The express request object.
+   * @param {object} res - The express response object.
+   * @return {object}
+   */
   static async putPublish(req, res) {
     const id = req.params.id || '';
     const userId = req.user._id;
@@ -172,6 +179,13 @@ class FilesController {
     });
   }
 
+  /**
+   * Method for the route PUT /files/:id/unpublish
+   * Unpublish a file by it's ID.
+   * @param {object} req - The express request object.
+   * @param {object} res - The express response object.
+   * @return {object}
+   */
   static async putUnpublish(req, res) {
     const id = req.params.id || '';
     const userId = req.user ? req.user._id : '';

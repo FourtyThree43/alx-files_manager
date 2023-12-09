@@ -112,11 +112,16 @@ class DBClient {
   async getFileByIdAndUserId(fileId, userId) {
     const filesCollection = await this.filesCollection();
     return filesCollection.findOne({
-    _id: new mongoDBCore.BSON.ObjectId(fileId),
-    userId: new mongoDBCore.BSON.ObjectId(userId)
+      _id: new mongoDBCore.BSON.ObjectId(fileId),
+      userId: new mongoDBCore.BSON.ObjectId(userId),
     });
   }
 
+  /**
+   * Retrives all files by their Parent ID and User ID.
+   * @param {string} queryParam - The query parameter.
+   * @return {Promise<Document[]>} The file document.
+   */
   async getFilesByQueryFilters(pipeline) {
     const filesCollection = await this.filesCollection();
     return filesCollection.aggregate(pipeline).toArray();
