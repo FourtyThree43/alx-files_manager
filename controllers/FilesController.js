@@ -116,35 +116,39 @@ class FilesController {
    */
   static async getIndex(req, res) {
     const parentId = req.query.parentId || 0;
-    const page = req.query.page || 0;
+    const userId = req.user._id;
+    const pagination = req.query.page || 0;
 
-    const filesFilter = {
-      userId: req._id,
-      parentId,
-    };
-
-    const aggregatePipeline = [
+    const filesFilter = { $and: [{ parentId }, { userId }] };
+    let aggregateData = [
       { $match: filesFilter },
-      { $sort: { _id: -1 } },
-      { $skip: page * MAX_FILES_PER_PAGE },
+      { $skip: pagination * MAX_FILES_PER_PAGE },
       { $limit: MAX_FILES_PER_PAGE },
-      {
-        $project: {
-          _id: 0,
-          id: '$_id',
-          userId: '$userId',
-          name: '$name',
-          type: '$type',
-          isPublic: '$isPublic',
-          parentId: {
-            $cond: { if: { $eq: ['$parentId', '0'] }, then: 0, else: '$parentId' },
-          },
-        },
-      },
     ];
-    const files = await dbClient.getFilesByQueryFilters(aggregatePipeline);
 
-    return res.json(files);
+    if (parentId === 0) {
+      aggregateData = [
+        { $skip: pagination * MAX_FILES_PER_PAGE },
+        { $limit: MAX_FILES_PER_PAGE },
+      ];
+    }
+
+    const files = await dbClient.getFilesByQueryFilters(aggregateData);
+    const filesArray = [];
+    await files.forEach((item) => {
+      const fileItem = {
+        id: item._id,
+        userId: item.userId,
+        name: item.name,
+        type: item.type,
+        isPublic: item.isPublic,
+        parentId: item.parentId,
+      };
+      filesArray.push(fileItem);
+    });
+    console.log(filesArray.length);
+    console.log(files.length);
+    return res.send(filesArray);
   }
 
   /**
