@@ -30,19 +30,16 @@ const verifyToken = async (req, res, next) => {
     const credentials = Buffer.from(base64Credentials[1], 'base64').toString('ascii');
     const [email, password] = credentials.split(':');
 
-    const sha1Password = sha1(password);
     const user = await dbClient.findUserByEmail(email);
 
-    if (!user || sha1Password !== user.password) {
+    if (!user || sha1(password) !== user.password) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
     req.user = user;
     next();
-  } else {
-    return res.status(401).json({ error: 'Unauthorized' });
   }
-  return null;
+  return res.status(401).json({ error: 'Unauthorized' });
 };
 
 export default verifyToken;
