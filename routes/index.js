@@ -27,7 +27,7 @@ const initializeRoutes = (api) => {
   api.get('/files', verifyToken, FilesController.getIndex);
   api.put('/files/:id/publish', verifyToken, FilesController.putPublish);
   api.put('/files/:id/unpublish', verifyToken, FilesController.putUnpublish);
-  api.get('/files/:id/data', verifyToken, FilesController.getFile);
+  api.get('/files/:id/data', FilesController.getFile);
 
   api.all('*', (req, res, next) => {
     errorResponse(new APIError(404, `Cannot ${req.method} ${req.url}`), req, res, next);

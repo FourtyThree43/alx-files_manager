@@ -156,7 +156,7 @@ class FilesController {
    * Publish a file by it's ID.
    * @param {object} req - The express request object.
    * @param {object} res - The express response object.
-   * @return {object}
+   * @return {object}    - The published file.
    */
   static async putPublish(req, res) {
     const id = req.params.id || '';
@@ -188,7 +188,7 @@ class FilesController {
    * Unpublish a file by it's ID.
    * @param {object} req - The express request object.
    * @param {object} res - The express response object.
-   * @return {object}
+   * @return {object}    - The unpublished file.
    */
   static async putUnpublish(req, res) {
     const id = req.params.id || '';
@@ -216,6 +216,13 @@ class FilesController {
     });
   }
 
+  /**
+   * Method for the route GET /files/:id/data
+   * Get's a file by it's ID.
+   * @param {object} req - The express request object.
+   * @param {object} res - The express response object.
+   * @return {object}    - The file data.
+   */
   static async getFile(req, res) {
     const id = req.params.id || '';
     const size = req.query.size || null;
