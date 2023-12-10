@@ -3,11 +3,11 @@ import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 
 /**
- * Function to get user from token.
+ * Function to get user from X-token.
  * @param {string} token - The token string.
  * @returns {object} The user object or null.
  */
-const getUserFromToken = async (token) => {
+const getUserFromXToken = async (token) => {
   const userId = await redisClient.get(`auth_${token}`);
   const user = await dbClient.findUserById(userId);
   return user;
@@ -41,13 +41,13 @@ const getUserFromAuthorization = async (authorization) => {
  * @returns {object} The user object or error status code.
  */
 const verifyToken = async (req, res, next) => {
-  const token = req.headers['x-token'];
+  const Xtoken = req.headers['x-token'];
   const authorization = req.headers.authorization || null;
 
   let user = null;
 
-  if (token) {
-    user = await getUserFromToken(token);
+  if (Xtoken) {
+    user = await getUserFromXToken(Xtoken);
   } else if (authorization) {
     user = await getUserFromAuthorization(authorization);
   }
@@ -59,3 +59,4 @@ const verifyToken = async (req, res, next) => {
 };
 
 export default verifyToken;
+export { getUserFromXToken };

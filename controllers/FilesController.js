@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Queue from 'bull/lib/queue';
 import fileService from '../utils/fileService';
 import dbClient from '../utils/db';
+import { getUserFromXToken } from '../middlewares/authenticate';
 
 const VALID_FILE_TYPES = { folder: 'folder', file: 'file', image: 'image' };
 const MAX_FILES_PER_PAGE = 20;
@@ -225,23 +226,32 @@ class FilesController {
    */
   static async getFile(req, res) {
     const id = req.params.id || '';
-    const size = req.query.size || null;
-    const userId = req.user ? req.user._id : '';
+    const size = req.query.size || 0;
 
     const file = await dbClient.getFileById(id);
-    if (!file || (!file.isPublic && (file.userId.toString() !== userId))) {
-      return res.status(404).json({ error: 'Not found' });
-    }
+    if (!file) return res.status(404).json({ error: 'Not found' });
+
+    const { userId, isPublic } = file;
+
+    // Get user from X-token
+    const XToken = req.headers['x-token'];
+    let user = null;
+    let owner = false;
+
+    user = await getUserFromXToken(XToken);
+    if (user) owner = (user._id.toString() === userId.toString());
+
+    if (!isPublic && !owner) return res.status(404).json({ error: 'Not found' });
     if (file.type === VALID_FILE_TYPES.folder) {
       return res.status(400).json({ error: 'A folder doesn\'t have content' });
     }
+
     const filePath = size === 0 ? file.localPath : `${file.localPath}_${size}`;
 
     try {
       const dataFile = fs.readFileSync(filePath);
       const mimeType = mime.contentType(file.name);
       res.setHeader('Content-Type', mimeType);
-
       return res.send(dataFile);
     } catch (error) {
       return res.status(404).send({ error: 'Not found' });
